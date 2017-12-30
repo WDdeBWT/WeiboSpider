@@ -7,7 +7,6 @@ import time
 import os
 import re
 import sys
-import urllib
 import socket
 from bs4 import BeautifulSoup
 from selenium import webdriver
@@ -75,7 +74,7 @@ class SpiderWeiboCmt:
 
 
 class TcpConnecter:
-    def __init__(self, server_ip = '119.23.239.27', server_port = '9999'):
+    def __init__(self, server_ip = '119.23.239.27', server_port = 9999):
         self.skt = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         # 建立连接:
         self.skt.connect((server_ip, server_port))
@@ -85,14 +84,18 @@ class TcpConnecter:
     def request_cmt_url(self):
         self.skt.send(b'requestcommenturl')            
         self.url_cmt = self.skt.recv(1024).decode('utf-8')
+        print(self.url_cmt)
         self.id_weibo = self.skt.recv(1024).decode('utf-8')
+        print(self.id_weibo)
         self.range_cmt = self.skt.recv(1024).decode('utf-8')
+        print(self.range_cmt)
         print('id_weibo: ' + self.id_weibo)
         return (self.id_weibo, self.url_cmt, self.range_cmt)
 
     def send_cmt_list(self, list_cmt):
+        print("-----send_cmt_list-----")
         for cmt in list_cmt:
-            self.skt.send(bytes(cmt))
+            self.skt.send(bytes(cmt, encoding = "utf-8"))
         self.skt.send(b'sendcommentlistfinish')
         receipt = self.skt.recv(1024).decode('utf-8')
         if receipt == 'receiveandsavesuccess':
@@ -108,4 +111,5 @@ spider.login_weibo()
 tcp_conn = TcpConnecter()
 id_weibo, url_cmt, range_cmt = tcp_conn.request_cmt_url()
 list_cmt = spider.get_all_cmt(id_weibo, url_cmt, range_cmt)
-tcp_conn.send_cmt_list(list_cmt)
+receipt = tcp_conn.send_cmt_list(list_cmt)
+print(receipt)

@@ -2,9 +2,24 @@
 __author__ = "WDdeBWT"
 __date__ = "2017/12/30"
 
-import requests
+def consumer():
+    r = ''
+    while True:
+        n = yield r
+        if not n:
+            return
+        print('[CONSUMER] Consuming %s...' % n)
+        r = '200 OK'
 
-url = r'https://weibo.cn/comment/FC1Nwh25C?uid=6003325152&rl=0&page=1'
-r = requests.get(url)
-print(r.encoding)
-print(r.apparent_encoding)
+def produce(c):
+    c.send(None)
+    n = 0
+    while n < 5:
+        n = n + 1
+        print('[PRODUCER] Producing %s...' % n)
+        r = c.send(n)
+        print('[PRODUCER] Consumer return: %s' % r)
+    c.close()
+
+c = consumer()
+produce(c)
