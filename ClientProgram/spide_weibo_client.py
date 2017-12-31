@@ -2,13 +2,15 @@
 __author__ = "WDdeBWT"
 __date__ = "2017/12/30"
 
-import time
+from TCP_connecter import *
 
 import os
 import re
 import sys
+import time
 import socket
 from bs4 import BeautifulSoup
+from multiprocessing import Queue
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import TimeoutException
@@ -47,7 +49,7 @@ class SpiderWeiboCmt:
             cmt_url = cmt_url[:-7]
         print("cmt_url:" + cmt_url)
 
-        for page in range(int(cmt_range/10)):
+        for page in range(int(int(cmt_range)/10)):
             crt_url = cmt_url + "&page=" + str(page+1) # current_page_url
             self.browser.get(crt_url)
             time.sleep(3)
@@ -64,7 +66,7 @@ class SpiderWeiboCmt:
                 try:
                     # 取出评论内容，添加到cmt_list中
                     comment = div_cmt.find_all("span", class_="ctt")[0]
-                    comment_text = comment.text.decode('GB2312', 'ignore').encode('utf-8')
+                    comment_text = comment.text
                     print(comment_text)
                     cmt_list.append(comment_text)
                 except Exception as e:
@@ -73,42 +75,64 @@ class SpiderWeiboCmt:
         return cmt_list
 
 
-class TcpConnecter:
+class ConnectingBridge:
     def __init__(self, server_ip = '119.23.239.27', server_port = 9999):
-        self.skt = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        # 建立连接:
-        self.skt.connect((server_ip, server_port))
-        # 接收欢迎消息:
-        print(self.skt.recv(1024).decode('utf-8'))
+        self.q_recv = Queue(maxsize = 10)
+        self.tcp_conn = TcpConnecter(self.q_recv, server_ip, server_port)
+        self.tcp_conn.start()
+        try:
+            recv = self.q_recv.get(block=True, timeout=10)
+            if recv[0] == 1:
+                print(recv[1])
+            else:
+                print("error 1")
+                os.system('pause')
+                sys.exit(1)
+        except Exception as e:
+            print(e)
+            print("----------连接服务器失败1，请关闭程序，稍后再试----------")
+            os.system('pause')
+            sys.exit(1)
+        
     
     def request_cmt_url(self):
-        self.skt.send(b'requestcommenturl')
-        self.url_cmt = self.skt.recv(1024).decode('utf-8')
-        print(self.url_cmt)
-        self.id_weibo = self.skt.recv(1024).decode('utf-8')
-        print(self.id_weibo)
-        self.range_cmt = self.skt.recv(1024).decode('utf-8')
-        print(self.range_cmt)
-        print('id_weibo: ' + self.id_weibo)
-        return (self.id_weibo, self.url_cmt, self.range_cmt)
+        self.tcp_conn.send_bag('requestcommenturl', 2)
+        try:
+            self.url_cmt = self.q_recv.get(block=True, timeout=10)[1]
+            self.id_weibo = self.q_recv.get(block=True, timeout=10)[1]
+            self.range_cmt = self.q_recv.get(block=True, timeout=10)[1]
+            print('-----id_weibo: ' + self.id_weibo + " range_cmt: " + self.range_cmt + "-----")
+            return (self.id_weibo, self.url_cmt, self.range_cmt)
+        except Exception as e:
+            print(e)
+            print("----------连接服务器失败2，请关闭程序，稍后再试----------")
+            os.system('pause')
+            sys.exit(1)
 
     def send_cmt_list(self, list_cmt):
         print("-----send_cmt_list-----")
         for cmt in list_cmt:
-            self.skt.send(bytes(cmt, encoding = "utf-8"))
-        self.skt.send(b'sendcommentlistfinish')
-        receipt = self.skt.recv(1024).decode('utf-8')
-        if receipt == 'receiveandsavesuccess':
-            self.skt.send(b'exit')
-            self.skt.close()
-            return '----------id_weibo:' + self.id_weibo + ' 评论数据已上传，服务端保存数据成功----------'
-        else:
-            return 'error: send_cmt_list'
+            self.tcp_conn.send_bag(cmt, 3)
+        self.tcp_conn.send_bag('sendcommentlistfinish', 2)
+        try:
+            recv = self.q_recv.get(block=True, timeout=20)
+            if (recv[0] == 2) and (recv[1] == 'receiveandsavesuccess'):
+                print('----------id_weibo:' + self.id_weibo + ' 评论数据已上传，服务端保存数据成功----------')
+                return 0
+            else:
+                print("error 2")
+                os.system('pause')
+                sys.exit(1)
+        except Exception as e:
+            print(e)
+            print("----------连接服务器失败3，请关闭程序，稍后再试----------")
+            os.system('pause')
+            sys.exit(1)
 
 
 spider = SpiderWeiboCmt()
 spider.login_weibo()
-tcp_conn = TcpConnecter()
+tcp_conn = ConnectingBridge()
 id_weibo, url_cmt, range_cmt = tcp_conn.request_cmt_url()
 list_cmt = spider.get_all_cmt(id_weibo, url_cmt, range_cmt)
 receipt = tcp_conn.send_cmt_list(list_cmt)
