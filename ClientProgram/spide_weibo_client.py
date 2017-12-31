@@ -82,7 +82,7 @@ class TcpConnecter:
         print(self.skt.recv(1024).decode('utf-8'))
     
     def request_cmt_url(self):
-        self.skt.send(b'requestcommenturl')            
+        self.skt.send(b'requestcommenturl')
         self.url_cmt = self.skt.recv(1024).decode('utf-8')
         print(self.url_cmt)
         self.id_weibo = self.skt.recv(1024).decode('utf-8')
