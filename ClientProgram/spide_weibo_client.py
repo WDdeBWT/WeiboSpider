@@ -22,7 +22,6 @@ class SpiderWeiboCmt:
         self.username = '15071306953'
         self.userpass = '19971027'
         self.url_login = 'https://passport.weibo.cn/signin/login'
-        self.file_path = "F:\\Files\\weibo_taobaibai"
 
     def login_weibo(self):
         self.browser.get(self.url_login)

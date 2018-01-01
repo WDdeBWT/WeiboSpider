@@ -18,7 +18,7 @@ class MSSQL:
         得到连接信息
         返回: conn.cursor()
         """
-        self.conn = pymssql.connect(host='localhost', user='WeiboSpiderUser', password='weibospideruser', database='GuestBook', charset="utf8")
+        self.conn = pymssql.connect(host='119.23.239.27', user='WeiboSpiderUser', password='weibospideruser', database='WeiboSpiderDB', charset="utf8")
         self.cur = self.conn.cursor()
         if not self.cur:
             print("连接数据库失败")
@@ -40,10 +40,10 @@ class MSSQL:
             self.cur.execute(sql)
             self.conn.commit()
             self.conn.close()
-            return True
+            return 0
         except Exception as e:
             print(e)
-            return False
+            return 1
     
     def close_connection(self):
         self.conn.close()

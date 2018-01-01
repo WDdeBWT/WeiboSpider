@@ -8,7 +8,7 @@ from aip import AipOcr
 APP_ID = '10492378'
 API_KEY = 'PeclifhsWLy991bIxA3OC5ab'
 SECRET_KEY = '0DdKiWzikvFylgvg5kQqLnZwHVCnU2r9'
-FILE_PATH = "F:\\Files\\weibo_taobaibai\\image\\6_aig_1.jpg"
+FILE_PATH = "F:\\105_aig_1.jpg"
 
 client = AipOcr(APP_ID, API_KEY, SECRET_KEY)
 
