@@ -7,15 +7,33 @@ import threading
 
 import socket
 
+def test1():
+    while True:
+        print("-----")
+        time.sleep(3)
+
 def tcplink(sock, addr):
     print('Accept new connection from %s:%s...' % addr)
     sock.send(b'Welcome!')
+    t = threading.Thread(target=test1, args=())
+    t.start()
     while True:
-        data = sock.recv(1024)
+        try:    
+            data = sock.recv(1024)
+        except Exception as e:
+            print("---11--")
+            break
         time.sleep(1)
-        if not data or data.decode('utf-8') == 'exit':
+        # if not data or data.decode('utf-8') == 'exit':
+        if not data:
             break
         sock.send(('Hello, %s!' % data.decode('utf-8')).encode('utf-8'))
+    if sock:
+        print(sock)
+        print(data)
+        print("true")
+    else:
+        print("false")
     sock.close()
     print('Connection from %s:%s closed.' % addr)
 

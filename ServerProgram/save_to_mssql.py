@@ -42,7 +42,7 @@ class MSSQL:
             self.conn.close()
             return 0
         except Exception as e:
-            print(e)
+            print("ERROR: " + e)
             return 1
     
     def close_connection(self):

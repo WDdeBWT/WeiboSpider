@@ -18,6 +18,7 @@ class TcpConnecter(threading.Thread):
         self.q_recv = q_recv
         self.server_ip = server_ip
         self.server_port = server_port
+        self.tr_flag = True
 
     def run(self):
         data_buffer = bytes()
@@ -27,6 +28,8 @@ class TcpConnecter(threading.Thread):
         self.skt.connect((self.server_ip, self.server_port))
         # 双层循环，从自定义的应用层协议中取出格式化的数据
         while True:
+            if not self.tr_flag:
+                break
             data = self.skt.recv(1024)
             if data:
                 # 把数据存入缓冲区，类似于push数据
@@ -46,9 +49,10 @@ class TcpConnecter(threading.Thread):
                     # 读取消息正文的内容
                     body = data_buffer[header_size:header_size + body_size]
                     # 将数据类型和数据主体放入q_recv队列中，设置阻塞超时为1s（理论上客户端不允许超时）
-                    self.q_recv.put((head_pack[1], body.decode('utf-8')), block=True, timeout=1)
+                    self.q_recv.put((head_pack[1], body.decode('utf-8', 'ignore')), block=True, timeout=1)
                     # 获取下一个数据包，类似于把数据pop出（粘包情况的处理）
                     data_buffer = data_buffer[header_size + body_size:]
+        self.skt.close()
     
     def send_bag(self, data, data_type):
         if type(data) != bytes:
@@ -56,6 +60,9 @@ class TcpConnecter(threading.Thread):
         header = [body.__len__(), data_type]
         head_pack = struct.pack("!2I", *header)
         self.skt.send(head_pack + body)
+
+    def end_thread(self):
+        self.tr_flag = False
 
 
 

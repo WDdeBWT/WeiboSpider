@@ -90,6 +90,7 @@ class ConnectingBridge:
         except Exception as e:
             print(e)
             print("----------连接服务器失败1，请关闭程序，稍后再试----------")
+            self.tcp_conn.end_thread()
             os.system('pause')
             sys.exit(1)
         
@@ -97,42 +98,56 @@ class ConnectingBridge:
     def request_cmt_url(self):
         self.tcp_conn.send_bag('requestcommenturl', 2)
         try:
-            self.url_cmt = self.q_recv.get(block=True, timeout=10)[1]
-            self.id_weibo = self.q_recv.get(block=True, timeout=10)[1]
+            recv = self.q_recv.get(block=True, timeout=10)
+            if (recv[0] == 2) and (recv[1] == 'finishcatchingweibo'):
+                print('----------爬取任务已全部完成，感谢您的帮助，再见----------')
+                return (0, 0, 0)
+            self.id_weibo = recv[1]
+            self.url_cmt = self.q_recv.get(block=True, timeout=10)[1]            
             self.range_cmt = self.q_recv.get(block=True, timeout=10)[1]
             print('-----id_weibo: ' + self.id_weibo + " range_cmt: " + self.range_cmt + "-----")
             return (self.id_weibo, self.url_cmt, self.range_cmt)
         except Exception as e:
             print(e)
             print("----------连接服务器失败2，请关闭程序，稍后再试----------")
+            self.tcp_conn.end_thread()
             os.system('pause')
             sys.exit(1)
 
     def send_cmt_list(self, list_cmt):
         print("-----send_cmt_list-----")
-        for cmt in list_cmt:
-            self.tcp_conn.send_bag(cmt, 3)
-        self.tcp_conn.send_bag('sendcommentlistfinish', 2)
         try:
-            recv = self.q_recv.get(block=True, timeout=20)
+            for cmt in list_cmt:
+                self.tcp_conn.send_bag(cmt, 3)
+            self.tcp_conn.send_bag('sendcommentlistfinish', 2)
+            recv = self.q_recv.get(block=True, timeout=300)
             if (recv[0] == 2) and (recv[1] == 'receiveandsavesuccess'):
                 print('----------id_weibo:' + self.id_weibo + ' 评论数据已上传，服务端保存数据成功----------')
+                self.tcp_conn.send_bag('exittcplink', 2)
+                self.tcp_conn.end_thread()
                 return 0
             else:
                 print("error 2")
+                self.tcp_conn.end_thread()
                 os.system('pause')
                 sys.exit(1)
         except Exception as e:
             print(e)
             print("----------连接服务器失败3，请关闭程序，稍后再试----------")
+            self.tcp_conn.end_thread()
             os.system('pause')
             sys.exit(1)
 
 
 spider = SpiderWeiboCmt()
 spider.login_weibo()
-tcp_conn = ConnectingBridge()
-id_weibo, url_cmt, range_cmt = tcp_conn.request_cmt_url()
-list_cmt = spider.get_all_cmt(id_weibo, url_cmt, range_cmt)
-receipt = tcp_conn.send_cmt_list(list_cmt)
-print(receipt)
+for i in range(100):
+    print("----------本客户端正在进行第" + (i+1) + "次微博评论爬取工作（每次大约需要30-90分钟）----------")
+    tcp_conn_brdg = ConnectingBridge()
+    id_weibo, url_cmt, range_cmt = tcp_conn_brdg.request_cmt_url()
+    if not (id_weibo == 0):
+        list_cmt = spider.get_all_cmt(id_weibo, url_cmt, range_cmt)
+        receipt = tcp_conn_brdg.send_cmt_list(list_cmt)
+        if receipt == 0:
+            print("----------爬取完成，weibo_id: " + id_weibo + "----------")
+            print(" ")
