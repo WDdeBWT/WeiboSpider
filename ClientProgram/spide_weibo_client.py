@@ -75,7 +75,7 @@ class SpiderWeiboCmt:
 
 
 class ConnectingBridge:
-    def __init__(self, server_ip = '119.23.239.27', server_port = 9999):
+    def __init__(self, server_ip = '127.0.0.1', server_port = 9999):
         self.q_recv = Queue(maxsize = 10)
         self.tcp_conn = TcpConnecter(self.q_recv, server_ip, server_port)
         self.tcp_conn.start()
@@ -89,7 +89,7 @@ class ConnectingBridge:
                 sys.exit(1)
         except Exception as e:
             print(e)
-            print("----------连接服务器失败1，请关闭程序，稍后再试----------")
+            print("----------ERROR1: 连接服务器失败，请关闭程序，稍后再试----------")
             self.tcp_conn.end_thread()
             os.system('pause')
             sys.exit(1)
@@ -109,7 +109,7 @@ class ConnectingBridge:
             return (self.id_weibo, self.url_cmt, self.range_cmt)
         except Exception as e:
             print(e)
-            print("----------连接服务器失败2，请关闭程序，稍后再试----------")
+            print("----------ERROR2: 连接服务器失败，请关闭程序，稍后再试----------")
             self.tcp_conn.end_thread()
             os.system('pause')
             sys.exit(1)
@@ -119,6 +119,7 @@ class ConnectingBridge:
         try:
             for cmt in list_cmt:
                 self.tcp_conn.send_bag(cmt, 3)
+            print("发送完成")
             self.tcp_conn.send_bag('sendcommentlistfinish', 2)
             recv = self.q_recv.get(block=True, timeout=300)
             if (recv[0] == 2) and (recv[1] == 'receiveandsavesuccess'):
@@ -133,7 +134,7 @@ class ConnectingBridge:
                 sys.exit(1)
         except Exception as e:
             print(e)
-            print("----------连接服务器失败3，请关闭程序，稍后再试----------")
+            print("----------ERROR3: 连接服务器失败，请关闭程序，稍后再试----------")
             self.tcp_conn.end_thread()
             os.system('pause')
             sys.exit(1)
@@ -142,7 +143,7 @@ class ConnectingBridge:
 spider = SpiderWeiboCmt()
 spider.login_weibo()
 for i in range(100):
-    print("----------本客户端正在进行第" + (i+1) + "次微博评论爬取工作（每次大约需要30-90分钟）----------")
+    print("----------本客户端正在进行第" + str(i+1) + "次微博评论爬取工作（每次大约需要30-90分钟）----------")
     tcp_conn_brdg = ConnectingBridge()
     id_weibo, url_cmt, range_cmt = tcp_conn_brdg.request_cmt_url()
     if not (id_weibo == 0):

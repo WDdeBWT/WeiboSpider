@@ -97,7 +97,7 @@ class SpiderWeiboMainImf:
                         mimf.insert_data()
                         mimf.close()
                     except Exception as e:
-                        print("ERROR: " + e)
+                        print(e)
         except Exception as e:
-            print("ERROR: " + e)
+            print(e)
         print("-------------------- get_main_ifmt 运行结束，当前时间：" + str(time.strftime('%Y-%m-%d',time.localtime(time.time()))) + "--------------------")

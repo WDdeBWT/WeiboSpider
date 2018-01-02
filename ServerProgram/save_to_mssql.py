@@ -39,10 +39,9 @@ class MSSQL:
         try:
             self.cur.execute(sql)
             self.conn.commit()
-            self.conn.close()
             return 0
         except Exception as e:
-            print("ERROR: " + e)
+            print(e)
             return 1
     
     def close_connection(self):

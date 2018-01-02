@@ -23,7 +23,9 @@ class MainImf:
             print("---------- MainImf 保存到数据库失败，微博内容：" + self.weibo_content + "----------")
     
     def update_data(self, weibo_id, update_item, update_value):
-        sql = "UPDATE main_imf SET " + update_item + " = " + update_value + " WHERE id = " + weibo_id
+        sql = "UPDATE main_imf SET " + update_item + " = " + str(update_value) + " WHERE id = " + str(weibo_id)
+        if 1 == self.ms_sql.ExecNonQuery(sql):
+            print("---------- MainImf 更新到数据库失败，微博内容：" + self.weibo_content + "----------")
     
     def select_data(self):
         sql = "SELECT * FROM main_imf"
@@ -42,7 +44,7 @@ class CmtImf:
     def insert_data(self):
         sql = "INSERT INTO cmt_imf VALUES(" + str(self.weibo_id) + ", '" + self.weibo_comment + "')"
         if 1 == self.ms_sql.ExecNonQuery(sql):
-            print("---------- CmtImf 保存到数据库失败，weibo_id：" + self.weibo_id + "----------")
+            print("---------- CmtImf 保存到数据库失败，weibo_id：" + str(self.weibo_id) + "----------")
 
     def select_data(self):
         sql = "SELECT * FROM cmt_imf"
@@ -61,7 +63,7 @@ class ImgImf:
     def insert_data(self):
         sql = "INSERT INTO img_imf VALUES(" + str(self.weibo_id) + ", '" + self.img_path + "')"
         if 1 == self.ms_sql.ExecNonQuery(sql):
-            print("---------- ImgImf 保存到数据库失败，weibo_id：" + self.weibo_id + "----------")
+            print("---------- ImgImf 保存到数据库失败，weibo_id：" + str(self.weibo_id) + "----------")
 
     def select_data(self):
         sql = "SELECT * FROM img_imf"

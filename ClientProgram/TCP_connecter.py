@@ -28,9 +28,14 @@ class TcpConnecter(threading.Thread):
         self.skt.connect((self.server_ip, self.server_port))
         # 双层循环，从自定义的应用层协议中取出格式化的数据
         while True:
-            if not self.tr_flag:
-                break
-            data = self.skt.recv(1024)
+            try:
+                data = self.skt.recv(1024)
+            except Exception as e:
+                if not self.tr_flag:
+                    break
+                else:
+                    print(e)
+                    break
             if data:
                 # 把数据存入缓冲区，类似于push数据
                 data_buffer += data
@@ -63,6 +68,8 @@ class TcpConnecter(threading.Thread):
 
     def end_thread(self):
         self.tr_flag = False
+        time.sleep(1)
+        self.skt.close()
 
 
 
