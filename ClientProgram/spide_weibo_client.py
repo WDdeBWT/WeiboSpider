@@ -41,7 +41,7 @@ class SpiderWeiboCmt:
         print("--------------------login success--------------------")
     
     def get_all_cmt(self, weibo_id, cmt_url, cmt_range):
-        print("~~~~~~~~~~get_all_cmt~~~~~~~~~~")
+        print("-----get_all_cmt-----")
         cmt_list = []
 
         if "#cmtfrm" in cmt_url:
@@ -70,12 +70,11 @@ class SpiderWeiboCmt:
                     cmt_list.append(comment_text)
                 except Exception as e:
                     print(e)
-        print("~~~~~~~~~~get_all_cmt END~~~~~~~~~~")
         return cmt_list
 
 
 class ConnectingBridge:
-    def __init__(self, server_ip = '127.0.0.1', server_port = 9999):
+    def __init__(self, server_ip = '119.23.239.27', server_port = 9999):
         self.q_recv = Queue(maxsize = 10)
         self.tcp_conn = TcpConnecter(self.q_recv, server_ip, server_port)
         self.tcp_conn.start()
@@ -117,10 +116,15 @@ class ConnectingBridge:
     def send_cmt_list(self, list_cmt):
         print("-----send_cmt_list-----")
         try:
-            for cmt in list_cmt:
-                self.tcp_conn.send_bag(cmt, 3)
-            print("发送完成")
-            self.tcp_conn.send_bag('sendcommentlistfinish', 2)
+            if list_cmt:
+                for cmt in list_cmt:
+                    self.tcp_conn.send_bag(cmt, 3)
+                print("发送完成")
+                self.tcp_conn.send_bag('sendcommentlistfinish', 2)
+            else:
+                print("未获取到数据")
+                self.tcp_conn.send_bag('exittcplink', 2)
+                return 1
             recv = self.q_recv.get(block=True, timeout=300)
             if (recv[0] == 2) and (recv[1] == 'receiveandsavesuccess'):
                 print('----------id_weibo:' + self.id_weibo + ' 评论数据已上传，服务端保存数据成功----------')
