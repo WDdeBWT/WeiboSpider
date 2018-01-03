@@ -59,9 +59,14 @@ class CommanderServer:
             elif (recv[0] == 2) and (recv[1] == 'sendcommentlistfinish'):# 收到数据发送完毕指令，开始保存数据
                 print("-----Saving to database, weibo_id: " + str(weibo_id) + "-----")
                 cimf = CmtImf(weibo_id, '')
-                for cmt in cmt_list:
-                    cimf.weibo_comment = cmt
+                # for cmt in cmt_list:
+                #     cimf.weibo_comment = cmt
+                #     cimf.insert_data()
+                for i in len(cmt_list):
+                    cimf.weibo_comment = cmt_list[i]
                     cimf.insert_data()
+                    if i%100 == 0:
+                        time.sleep(1)
                 cimf.close()
                 mimf = MainImf()
                 mimf.update_data(weibo_id, "cmt_finish", 1)
