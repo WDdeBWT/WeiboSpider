@@ -125,7 +125,7 @@ class ConnectingBridge:
                 print("未获取到数据")
                 self.tcp_conn.send_bag('exittcplink', 2)
                 return 1
-            recv = self.q_recv.get(block=True, timeout=300)
+            recv = self.q_recv.get(block=True, timeout=1800)
             if (recv[0] == 2) and (recv[1] == 'receiveandsavesuccess'):
                 print('----------id_weibo:' + self.id_weibo + ' 评论数据已上传，服务端保存数据成功----------')
                 self.tcp_conn.send_bag('exittcplink', 2)

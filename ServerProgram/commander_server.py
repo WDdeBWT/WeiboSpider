@@ -2,6 +2,7 @@
 __author__ = "WDdeBWT"
 __date__ = "2017/12/31"
 
+from sql_server import *
 from database_model import *
 from spide_weibo_server import *
 from TCP_connecter_server import *
@@ -23,6 +24,7 @@ from selenium.common.exceptions import TimeoutException
 
 class CommanderServer:
     def __init__(self):
+        self.q_sql = Queue(maxsize = 0)
         self.range_cmt = 30000
         self.pages = 60
         self.is_catching = set()
@@ -59,18 +61,15 @@ class CommanderServer:
             elif (recv[0] == 2) and (recv[1] == 'sendcommentlistfinish'):# 收到数据发送完毕指令，开始保存数据
                 print("-----Saving to database, weibo_id: " + str(weibo_id) + "-----")
                 cimf = CmtImf(weibo_id, '')
-                # for cmt in cmt_list:
-                #     cimf.weibo_comment = cmt
-                #     cimf.insert_data()
-                for i in len(cmt_list):
-                    cimf.weibo_comment = cmt_list[i]
-                    cimf.insert_data()
-                    if i%100 == 0:
-                        time.sleep(1)
-                cimf.close()
+                for cmt in cmt_list:
+                    cimf.weibo_comment = cmt
+                    # cimf.insert_data()
+                    self.q_sql.put(cimf.insert_data())
+                # cimf.close()
                 mimf = MainImf()
-                mimf.update_data(weibo_id, "cmt_finish", 1)
-                mimf.close()
+                # mimf.update_data(weibo_id, "cmt_finish", 1)
+                self.q_sql.put(mimf.update_data(weibo_id, "cmt_finish", 1))
+                # mimf.close()
                 tcp_conn.send_bag('receiveandsavesuccess', 2)
                 print("-----Receive and save success, weibo_id: " + str(weibo_id) + "-----")
 
@@ -91,9 +90,12 @@ class CommanderServer:
     def commander(self):
         print("----------分布式微博爬虫服务端程序----------")
         # 执行SpiderWeiboMainImf，爬取全部微博主体信息
-        spider = SpiderWeiboMainImf(self.pages, self.range_cmt)
-        spider.login_weibo()
-        spider.get_main_ifmt()
+        # spider = SpiderWeiboMainImf(self.pages, self.range_cmt)
+        # spider.login_weibo()
+        # spider.get_main_ifmt()
+
+        sql_svr = SqlServer(self.q_sql)
+        sql_svr.start()
 
         while True:
             flag = 0
@@ -101,8 +103,9 @@ class CommanderServer:
             sock, addr = self.skt.accept()
             # 从数据库中找到需要爬取的url_cmt，创建新线程来处理TCP连接:
             mimf = MainImf()
-            results = mimf.select_data()
-            mimf.close()
+            # results = mimf.select_data()
+            # mimf.close()
+            results = self.q_sql.put(mimf.select_data())
             for result in results:
                 if (result[9] == False) and (result[0] not in self.is_catching):
                     flag = 1
