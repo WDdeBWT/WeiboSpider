@@ -2,7 +2,7 @@
 __author__ = "WDdeBWT"
 __date__ = "2017/12/31"
 
-from sql_server import *
+from auto_sql import *
 from database_model import *
 from spide_weibo_server import *
 from TCP_connecter_server import *
@@ -94,8 +94,8 @@ class CommanderServer:
         # spider.login_weibo()
         # spider.get_main_ifmt()
 
-        sql_svr = SqlServer(self.q_sql)
-        sql_svr.start()
+        au_svr = AutoSql(self.q_sql)
+        au_svr.start()
 
         while True:
             flag = 0
@@ -105,7 +105,7 @@ class CommanderServer:
             mimf = MainImf()
             # results = mimf.select_data()
             # mimf.close()
-            results = self.q_sql.put(mimf.select_data())
+            results = au_svr.select_db(mimf.select_data())
             for result in results:
                 if (result[9] == False) and (result[0] not in self.is_catching):
                     flag = 1

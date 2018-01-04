@@ -79,7 +79,7 @@ class ConnectingBridge:
         self.tcp_conn = TcpConnecter(self.q_recv, server_ip, server_port)
         self.tcp_conn.start()
         try:
-            recv = self.q_recv.get(block=True, timeout=10)
+            recv = self.q_recv.get(block=True, timeout=1800)
             if recv[0] == 1:
                 print(recv[1])
             else:
@@ -97,13 +97,13 @@ class ConnectingBridge:
     def request_cmt_url(self):
         self.tcp_conn.send_bag('requestcommenturl', 2)
         try:
-            recv = self.q_recv.get(block=True, timeout=10)
+            recv = self.q_recv.get(block=True, timeout=1800)
             if (recv[0] == 2) and (recv[1] == 'finishcatchingweibo'):
                 print('----------爬取任务已全部完成，感谢您的帮助，再见----------')
                 return (0, 0, 0)
             self.id_weibo = recv[1]
-            self.url_cmt = self.q_recv.get(block=True, timeout=10)[1]            
-            self.range_cmt = self.q_recv.get(block=True, timeout=10)[1]
+            self.url_cmt = self.q_recv.get(block=True, timeout=1800)[1]            
+            self.range_cmt = self.q_recv.get(block=True, timeout=1800)[1]
             print('-----id_weibo: ' + self.id_weibo + " range_cmt: " + self.range_cmt + "-----")
             return (self.id_weibo, self.url_cmt, self.range_cmt)
         except Exception as e:

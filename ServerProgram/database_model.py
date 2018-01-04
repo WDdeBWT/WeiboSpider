@@ -18,19 +18,19 @@ class MainImf:
     
     def insert_data(self):
         sql = "INSERT INTO main_imf VALUES('" + self.weibo_content + "', '" + self.weibo_time + "', '" + self.comment_url + "', '" + self.one_img_url + "', '" + self.all_img_url + "', " + str(self.comment_count) + ", " + str(self.like_count) + ", " + str(self.img_finish) + ", " + str(self.cmt_finish) + ")"
-        return (2, sql)
+        return sql
         # if 1 == self.ms_sql.ExecNonQuery(sql):
         #     print("---------- MainImf 保存到数据库失败，微博内容：" + self.weibo_content + "----------")
     
     def update_data(self, weibo_id, update_item, update_value):
         sql = "UPDATE main_imf SET " + update_item + " = " + str(update_value) + " WHERE id = " + str(weibo_id)
-        return (2, sql)
+        return sql
         # if 1 == self.ms_sql.ExecNonQuery(sql):
         #     print("---------- MainImf 更新到数据库失败，微博内容：" + self.weibo_content + "----------")
     
     def select_data(self):
         sql = "SELECT * FROM main_imf"
-        return (1, sql)
+        return sql
         # return self.ms_sql.ExecQuery(sql)
     
     # def close(self):
@@ -45,13 +45,13 @@ class CmtImf:
     
     def insert_data(self):
         sql = "INSERT INTO cmt_imf VALUES(" + str(self.weibo_id) + ", '" + self.weibo_comment + "')"
-        return (2, sql)
+        return sql
         # if 1 == self.ms_sql.ExecNonQuery(sql):
         #     print("---------- CmtImf 保存到数据库失败，weibo_id：" + str(self.weibo_id) + "----------")
 
     def select_data(self):
         sql = "SELECT * FROM cmt_imf"
-        return (1, sql)
+        return sql
         # return self.ms_sql.ExecQuery(sql)
     
     # def close(self):
@@ -66,13 +66,13 @@ class ImgImf:
     
     def insert_data(self):
         sql = "INSERT INTO img_imf VALUES(" + str(self.weibo_id) + ", '" + self.img_path + "')"
-        return (2, sql)
+        return sql
         # if 1 == self.ms_sql.ExecNonQuery(sql):
         #     print("---------- ImgImf 保存到数据库失败，weibo_id：" + str(self.weibo_id) + "----------")
 
     def select_data(self):
         sql = "SELECT * FROM img_imf"
-        return (1, sql)
+        return sql
         # return self.ms_sql.ExecQuery(sql)
     
     # def close(self):
