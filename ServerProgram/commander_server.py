@@ -34,7 +34,8 @@ class CommanderServer:
         print('Waiting for connection...')
 
     def tcp_link(self, sock, addr, weibo_id, cmt_range, cmt_url):
-        cmt_list = []
+        cmt_list = [] # comment list
+        ist_order = 0 # insert order
         q_recv = Queue(maxsize = self.range_cmt + 10)
         tcp_conn = TcpConnecterServer(q_recv, sock)
         tcp_conn.start()
@@ -56,13 +57,15 @@ class CommanderServer:
                 tcp_conn.send_bag(str(cmt_range), 3)
 
             elif recv[0] == 3:# 收到数据，添加到cmt_list中
-                cmt_list.append(recv[1])
+                ist_order += 1
+                cmt_list.append((recv[1], ist_order))
 
             elif (recv[0] == 2) and (recv[1] == 'sendcommentlistfinish'):# 收到数据发送完毕指令，开始保存数据
                 print("-----Saving to database, weibo_id: " + str(weibo_id) + "-----")
                 cimf = CmtImf(weibo_id, '')
                 for cmt in cmt_list:
-                    cimf.weibo_comment = cmt
+                    cimf.weibo_comment = cmt[0]
+                    cimf.insert_order = cmt[1]
                     # cimf.insert_data()
                     self.q_sql.put(cimf.insert_data())
                 # cimf.close()
@@ -89,13 +92,13 @@ class CommanderServer:
 
     def commander(self):
         print("----------分布式微博爬虫服务端程序----------")
-        # 执行SpiderWeiboMainImf，爬取全部微博主体信息
-        # spider = SpiderWeiboMainImf(self.pages, self.range_cmt)
-        # spider.login_weibo()
-        # spider.get_main_ifmt()
-
         au_svr = AutoSql(self.q_sql)
         au_svr.start()
+
+        # 执行SpiderWeiboMainImf，爬取全部微博主体信息
+        spider = SpiderWeiboMainImf(self.pages, self.range_cmt, self.q_sql)
+        spider.login_weibo()
+        spider.get_main_ifmt()
 
         while True:
             flag = 0

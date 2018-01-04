@@ -38,13 +38,14 @@ class MainImf:
 
 
 class CmtImf:
-    def __init__(self, weibo_id = 0, weibo_comment = ''):
+    def __init__(self, weibo_id = 0, weibo_comment = '', insert_order = 0):
         self.weibo_id = weibo_id
         self.weibo_comment = weibo_comment
+        self.insert_order = insert_order
         # self.ms_sql = MSSQL()
     
     def insert_data(self):
-        sql = "INSERT INTO cmt_imf VALUES(" + str(self.weibo_id) + ", '" + self.weibo_comment + "')"
+        sql = "INSERT INTO cmt_imf VALUES(" + str(self.weibo_id) + ", '" + self.weibo_comment + "', " + str(self.insert_order) + ")"
         return sql
         # if 1 == self.ms_sql.ExecNonQuery(sql):
         #     print("---------- CmtImf 保存到数据库失败，weibo_id：" + str(self.weibo_id) + "----------")

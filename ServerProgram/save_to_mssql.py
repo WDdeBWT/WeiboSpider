@@ -18,10 +18,13 @@ class MSSQL:
         得到连接信息
         返回: conn.cursor()
         """
-        self.conn = pymssql.connect(host='119.23.239.27', user='WeiboSpiderUser', password='weibospideruser', database='WeiboSpiderDB', charset="utf8")
+        # self.conn = pymssql.connect(host='119.23.239.27', user='WeiboSpiderUser', password='weibospideruser', database='WeiboSpiderDB', charset="utf8")
+        self.conn=pymssql.connect(host='.',database='WeiboSpiderDB', charset="utf8")
         self.cur = self.conn.cursor()
-        if not self.cur:
+        if self.cur:
             print("连接数据库失败")
+        else:
+            print("连接数据库成功")
 
     def ExecQuery(self,sql):
         """

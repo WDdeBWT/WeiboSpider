@@ -21,13 +21,14 @@ from selenium.common.exceptions import TimeoutException
 
 
 class SpiderWeiboMainImf:
-    def __init__(self, pages, cmt_range):
+    def __init__(self, pages, cmt_range, q_sql):
         self.browser = webdriver.Chrome()
         self.username = '15071306953'
         self.userpass = '19971027'
         self.url_login = 'https://passport.weibo.cn/signin/login'
         self.pages = pages
         self.cmt_range = cmt_range
+        self.q_sql = q_sql
 
     def login_weibo(self):
         self.browser.get(self.url_login)
@@ -94,10 +95,10 @@ class SpiderWeiboMainImf:
                                 pattern = re.compile('\[(.*?)\]')
                                 like_count = int(re.findall(pattern, one_a.text)[0])
                                 mimf.like_count = like_count
-                        mimf.insert_data()
-                        mimf.close()
+                        self.q_sql.put(mimf.insert_data())
                     except Exception as e:
                         print(e)
         except Exception as e:
             print(e)
+        self.browser.close()
         print("-------------------- get_main_ifmt 运行结束，当前时间：" + str(time.strftime('%Y-%m-%d',time.localtime(time.time()))) + "--------------------")
