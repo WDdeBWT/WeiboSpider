@@ -101,4 +101,4 @@ class SpiderWeiboMainImf:
         except Exception as e:
             print(e)
         self.browser.close()
-        print("-------------------- get_main_ifmt 运行结束，当前时间：" + str(time.strftime('%Y-%m-%d',time.localtime(time.time()))) + "--------------------")
+        print("-------------------- get_main_ifmt 运行结束，当前时间：" + str(time.strftime('%m-%d %H:%M:%S',time.localtime(time.time()))) + "--------------------")

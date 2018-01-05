@@ -31,6 +31,7 @@ class TcpConnecterServer(threading.Thread):
                     break
                 else:
                     print(e)
+                    print("^TIME^: " + str(time.strftime('%m-%d %H:%M:%S',time.localtime(time.time()))))
                     break
             if data:
                 # 把数据存入缓冲区，类似于push数据

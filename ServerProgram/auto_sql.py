@@ -27,5 +27,5 @@ class AutoSql(threading.Thread):
             time.sleep(10)
             i += 1
             if i%10 == 0:
-                print("WARNING: q_sql is not empty, times: " + str(i/10) + ", present time: " + str(time.strftime('%Y-%m-%d',time.localtime(time.time()))))
+                print("WARNING: q_sql is not empty, times: " + str(i/10) + ", present time: " + str(time.strftime('%m-%d %H:%M:%S',time.localtime(time.time()))))
         return self.ms_sql.ExecQuery(sql)

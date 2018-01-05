@@ -45,6 +45,7 @@ class MSSQL:
             return 0
         except Exception as e:
             print(e)
+            print("^TIME^: " + str(time.strftime('%m-%d %H:%M:%S',time.localtime(time.time()))))
             return 1
     
     def close_connection(self):

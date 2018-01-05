@@ -5,4 +5,4 @@ __date__ = "2017/12/30"
 
 class ServerLog:
     def __init__(self):
-        
+        pass
