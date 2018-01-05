@@ -2,6 +2,8 @@
 __author__ = "WDdeBWT"
 __date__ = "2017/12/30"
 
+import time
+
 
 class ServerLog:
     def __init__(self):

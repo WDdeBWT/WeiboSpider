@@ -4,6 +4,9 @@ __date__ = "2017/12/30"
 
 import pymssql
 
+import time
+
+
 class MSSQL:
     """
     对pymssql的简单封装

@@ -2,6 +2,8 @@
 __author__ = "WDdeBWT"
 __date__ = "2018/01/02"
 
+import time
+
 
 class MainImf:
     def __init__(self, weibo_content = '', weibo_time = '2000-1-1', comment_url = '', one_img_url = '', all_img_url = '', comment_count = 0, like_count = 0, img_finish = 0, cmt_finish = 0):
