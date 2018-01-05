@@ -22,9 +22,9 @@ class MSSQL:
         self.conn=pymssql.connect(host='.',database='WeiboSpiderDB', charset="utf8")
         self.cur = self.conn.cursor()
         if self.cur:
-            print("连接数据库失败")
-        else:
             print("连接数据库成功")
+        else:
+            print("连接数据库失败")
 
     def ExecQuery(self,sql):
         """
