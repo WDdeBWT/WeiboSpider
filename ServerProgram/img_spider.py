@@ -17,6 +17,9 @@ from selenium.webdriver.common.keys import Keys
 
 
 class SpiderWeiboImage:
+    """
+    图片爬虫，根据数据库内的记录，爬去微博配图（独立于服务端程序运行）
+    """
     def __init__(self):
         self.browser = webdriver.Chrome()
         self.username = ''

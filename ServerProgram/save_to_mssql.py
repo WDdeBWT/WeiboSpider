@@ -21,7 +21,7 @@ class MSSQL:
         得到连接信息
         返回: conn.cursor()
         """
-        # self.conn = pymssql.connect(host='119.23.239.27', user='WeiboSpiderUser', password='weibospideruser', database='WeiboSpiderDB', charset="utf8")
+        # self.conn = pymssql.connect(host='119.23.239.27', user='', password='', database='WeiboSpiderDB', charset="utf8")
         self.conn=pymssql.connect(host='.',database='WeiboSpiderDB', charset="utf8")
         self.cur = self.conn.cursor()
         if self.cur:

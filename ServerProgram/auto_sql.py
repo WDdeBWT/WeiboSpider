@@ -10,6 +10,9 @@ from save_to_mssql import *
 
 
 class AutoSql(threading.Thread):
+    """
+    自动按照q_sql队列执行sql代码，降低数据库压力，提高数据库可靠性
+    """
     def __init__(self, q_sql):
         threading.Thread.__init__(self)
         self.q_sql = q_sql
