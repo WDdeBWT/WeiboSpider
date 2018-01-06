@@ -20,8 +20,8 @@ from selenium.webdriver.common.keys import Keys
 class SpiderWeibo:
     def __init__(self):
         self.browser = webdriver.Chrome()
-        self.username = '15071306953'
-        self.userpass = '19971027'
+        self.username = ''
+        self.userpass = ''
         self.url_login = 'https://passport.weibo.cn/signin/login'
         self.file_path = "F:\\Files\\weibo_taobaibai"
 
