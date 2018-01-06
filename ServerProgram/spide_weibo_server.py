@@ -23,8 +23,8 @@ from selenium.common.exceptions import TimeoutException
 class SpiderWeiboMainImf:
     def __init__(self, pages, cmt_range, q_sql):
         self.browser = webdriver.Chrome()
-        self.username = '15071306953'
-        self.userpass = '19971027'
+        self.username = ''
+        self.userpass = ''
         self.url_login = 'https://passport.weibo.cn/signin/login'
         self.pages = pages
         self.cmt_range = cmt_range

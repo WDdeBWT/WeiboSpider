@@ -19,8 +19,8 @@ from selenium.common.exceptions import TimeoutException
 class SpiderWeiboCmt:
     def __init__(self):
         self.browser = webdriver.Chrome()
-        self.username = '15071306953'
-        self.userpass = '19971027'
+        self.username = ''
+        self.userpass = ''
         self.url_login = 'https://passport.weibo.cn/signin/login'
 
     def login_weibo(self):
