@@ -56,10 +56,29 @@ class SpiderWeiboCmt:
             # 查找该页面所有评论的div
             soup = BeautifulSoup(self.browser.page_source, "html.parser")
             all_div_cmt = soup.find_all("div", class_ = 'c', id = re.compile("^C_"))
-            # 如果本页没有评论，则跳出翻页循环
+            # 如果本页没有评论，则考虑可能是翻到了最后一页之后
             if not all_div_cmt:
-                print("本页无内容")
-                break
+                time.sleep(10)
+                self.browser.get(crt_url)
+                time.sleep(3)
+                soup = BeautifulSoup(self.browser.page_source, "html.parser")
+                all_div_cmt = soup.find_all("div", class_ = 'c', id = re.compile("^C_"))
+                # 第二次确认本页是否确实没有评论
+                if not all_div_cmt:
+                    time.sleep(30)
+                    # 向前翻一页再翻回来，保证确实是没有新的评论了
+                    crt_url = cmt_url + "&page=" + str(page)
+                    self.browser.get(crt_url)
+                    time.sleep(3)
+                    crt_url = cmt_url + "&page=" + str(page+1) # current_page_url
+                    self.browser.get(crt_url)
+                    time.sleep(3)
+                    soup = BeautifulSoup(self.browser.page_source, "html.parser")
+                    all_div_cmt = soup.find_all("div", class_ = 'c', id = re.compile("^C_"))
+                    # 第三次确认本页是否确实没有评论（最后一次）
+                    if not all_div_cmt:
+                        print("本页无内容")
+                        break
             # 遍历评论
             for div_cmt in all_div_cmt:
                 try:
